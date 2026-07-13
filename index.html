@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+  
+  <style>
+    * { box-sizing: border-box; font-family: 'Inter', sans-serif !important; }
+    html, body { height: 100%; margin: 0; padding: 0; background: #eff3f8; display: flex; flex-direction: column; }
+    
+    .wrapper { flex: 1 0 auto; display: flex; justify-content: center; align-items: center; padding: 40px 20px; }
+    .search-card { width: 100%; max-width: 520px; padding: 45px 40px; background: #ffffff; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.08); text-align: center; border: none; }
+    .brand-icon { font-size: 45px; color: #0d6efd; margin-bottom: 12px; }
+    .title-primary { font-size: 21px; font-weight: 700; color: #003399; margin-bottom: 6px; text-transform: uppercase; }
+    .title-secondary { font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 35px; text-transform: uppercase; letter-spacing: 0.02em; }
+    
+    .form-control, .form-select { font-weight: 400 !important; font-size: 14.5px; color: #334155; border: 1px solid #cbd5e1; padding: 10.5px 14px; border-radius: 8px; }
+    .form-control:focus, .form-select:focus { border-color: #003399; box-shadow: 0 0 0 3px rgba(0, 51, 153, 0.15); }
+    .form-label-custom { font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.01em; }
+
+    .btn-search { background-color: #003399 !important; border: 1px solid #003399 !important; color: #fff !important; padding: 12px 0; font-weight: 700; font-size: 14.5px; border-radius: 8px; transition: all 0.2s ease; }
+    .btn-search:hover { background-color: #002266 !important; border-color: #002266 !important; }
+    
+    /* MODAL POPUP */
+    .custom-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.6); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
+    .custom-modal-card { background: #ffffff; border-radius: 12px; max-width: 585px; width: 100%; padding: 25px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); text-align: center; }
+    .preview-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin: 15px 0; }
+    .preview-box img { width: 100%; height: auto; border-radius: 4px; border: 1px solid #cbd5e1; }
+    
+    /* PORTAL FOOTER GIAO DIỆN PHẲNG CÂN ĐỐI LỀ HAI BÊN */
+    .portal-footer { background-color: #003399; color: #ffffff; padding: 22px 0 14px 0; font-size: 13.5px; line-height: 1.4; width: 100%; text-align: left; flex-shrink: 0; }
+    .portal-footer .f-header { font-size: 14px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; color: #ffffff; letter-spacing: 0.02em; white-space: nowrap; }
+    .portal-footer .f-info-item { display: flex; align-items: flex-start; margin-bottom: 3px; opacity: 0.95; }
+    .portal-footer .f-info-item span { margin-right: 6px; }
+    .portal-footer a { color: #ffffff; text-decoration: none; font-weight: 500; }
+    .portal-footer a:hover { text-decoration: underline; }
+    
+    .portal-footer .bottom-bar { border-top: 1px solid rgba(255, 255, 255, 0.12); padding-top: 10px; margin-top: 14px; text-align: center; font-size: 12.5px; color: rgba(255, 255, 255, 0.6); }
+    .portal-footer .bottom-bar strong { font-weight: 700; color: rgba(255, 255, 255, 0.7); }
+    .portal-footer .f-subtext { font-size: 11px; font-style: italic; margin-top: 1px; display: block; color: rgba(255, 255, 255, 0.45); }
+  </style>
+</head>
+<body>
+
+  <div class="wrapper">
+    <div class="search-card">
+      <div class="brand-icon">🏅</div>
+      <div class="title-primary">HỆ THỐNG TRA CỨU</div>
+      <div class="title-secondary">GIẤY CHỨNG NHẬN THANH NIÊN KHỎE</div>
+      
+      <div class="mb-3 text-start">
+        <label class="form-label-custom">Mã số sinh viên (MSSV):</label>
+        <input type="text" id="mssvInput" class="form-control" placeholder="Nhập mã số sinh viên của bạn...">
+      </div>
+
+      <div class="mb-3 text-start">
+        <label class="form-label-custom">Chọn năm học:</label>
+        <select id="namHocSelect" class="form-select" onchange="handleNamHocChange()">
+          <option value="">-- Chọn Năm Học --</option>
+          <option value="NH 2025 - 2026">NH 2025 - 2026</option>
+          <option value="NH 2024 - 2025">NH 2024 - 2025</option>
+        </select>
+      </div>
+      
+      <div class="mb-4 text-start">
+        <label class="form-label-custom">Chọn chương trình:</label>
+        <select id="programSelect" class="form-select" disabled>
+          <option value="">-- Vui lòng chọn năm học trước --</option>
+        </select>
+      </div>
+      
+      <button id="btnSubmit" class="btn btn-search w-100 text-uppercase" onclick="handleSearch()">Tra Cứu &rarr;</button>
+      
+      <div id="loadingStatus" class="text-muted mt-3" style="display:none; font-size:13.5px;">
+        <div class="spinner-border spinner-border-sm text-primary me-1"></div> Hệ thống đang xác thực, vui lòng chờ...
+      </div>
+    </div>
+  </div>
+
+  <div id="resultModal" class="custom-modal-overlay">
+    <div class="custom-modal-card">
+      <h5 class="text-success fw-bold mb-2">🎉 TRA CỨU THÀNH CÔNG</h5>
+      <p class="text-muted small mb-3">Giấy chứng nhận trực tuyến đã được cấp. Bạn có thể kiểm tra bản xem trước bên dưới và bấm nút lưu về thiết bị.</p>
+      
+      <div class="preview-box">
+        <img id="certPreview" src="" alt="Giấy chứng nhận xem trước">
+      </div>
+      
+      <div class="row g-2">
+        <div class="col-6">
+          <button id="btnDownload" class="btn btn-success w-100 fw-bold py-2">⬇️ Tải ảnh về máy</button>
+        </div>
+        <div class="col-6">
+          <button class="btn btn-secondary w-100 fw-bold py-2" onclick="closeModal()">Đóng cửa sổ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="portal-footer">
+    <div class="container" style="max-width: 1200px; padding: 0 15px;">
+      <div class="row g-2">
+        
+        <div class="col-12 col-md-5 text-start p-0">
+          <div class="f-header" style="margin-bottom: 4px; white-space: nowrap;">Hệ thống quản lý giấy chứng nhận</div>
+          <div style="font-size: 13px; font-weight: 500; opacity: 0.9; white-space: nowrap;">ĐOÀN THANH NIÊN - HỘI SINH VIÊN ĐẠI HỌC Y DƯỢC TPHCM</div>
+        </div>
+        
+        <div class="col-12 col-md-4 text-start">
+          <div class="f-header">📍 ĐỊA CHỈ</div>
+          <div class="f-info-item"><span>•</span>540 Ngô Gia Tự, Phường An Đông, TP. Hồ Chí Minh</div>
+          <div class="f-info-item"><span>•</span>217 Hồng Bàng, Phường Chợ Lớn, TP. Hồ Chí Minh</div>
+        </div>
+        
+        <div class="col-12 col-md-3 text-start">
+          <div class="f-header">📧 LIÊN HỆ</div>
+          <div class="f-info-item" style="white-space: nowrap;"><span>•</span>Văn phòng Đoàn - Hội: <a href="mailto:vpdhump@gmail.com">vpdhump@gmail.com</a></div>
+          <div class="f-info-item" style="white-space: nowrap;"><span>•</span>Hội Sinh viên: <a href="mailto:hoisinhvien@ump.edu.vn">hoisinhvien@ump.edu.vn</a></div>
+          <div class="f-info-item" style="white-space: nowrap;"><span>•</span>Fanpage: <a href="https://www.facebook.com/tuoitreyduochcm" target="_blank">Tuổi trẻ Y Dược</a></div>
+        </div>
+        
+      </div>
+      
+      <div class="bottom-bar">
+        <strong>© 2026 VĂN PHÒNG ĐOÀN THANH NIÊN - HỘI SINH VIÊN ĐẠI HỌC Y DƯỢC TP. HỒ CHÍ MINH</strong>
+        <span class="f-subtext">The website was developed by NTCL team</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // 🔗 ĐIỀN ĐƯỜNG LINK WEB APP GOOGLE APPS SCRIPT CỦA BẠN VÀO ĐÂY
+    const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbwsR3_-M8N544f89QfP8QCl_7uG_Y4PzS2Ob0Dx_shQE_oUAvnqXQsYEplyH-LAnnML/exec";
+
+    // 1. Tự động thiết lập cấu hình danh sách năm học cố định để tối ưu tốc độ load
+    window.addEventListener('load', function() {
+      const selectBox = document.getElementById('namHocSelect');
+      selectBox.innerHTML = `
+        <option value="">-- Chọn Năm Học --</option>
+        <option value="NH 2025 - 2026">NH 2025 - 2026</option>
+        <option value="NH 2024 - 2025">NH 2024 - 2025</option>
+      `;
+    });
+
+    // 2. KHI ĐỔI NĂM HỌC -> TRUY CẬP SHEET ĐÓ LỌC CHƯƠNG TRÌNH QUA FETCH API
+    function handleNamHocChange() {
+      const selectedSheet = document.getElementById('namHocSelect').value;
+      const progSelect = document.getElementById('programSelect');
+      
+      if (!selectedSheet) {
+        progSelect.innerHTML = '<option value="">-- Vui lòng chọn năm học trước --</option>';
+        progSelect.disabled = true;
+        return;
+      }
+      
+      progSelect.disabled = true;
+      progSelect.innerHTML = '<option value="">Đang tải danh sách chương trình...</option>';
+      
+      fetch(GOOGLE_API_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "getPrograms", namHoc: selectedSheet })
+      })
+      .then(res => res.json())
+      .then(response => {
+        progSelect.innerHTML = '';
+        if(!response.success || response.data.length === 0) {
+          progSelect.innerHTML = '<option value="">Không có chương trình trong năm học này</option>';
+          return;
+        }
+        progSelect.innerHTML = '<option value="">-- Chọn chương trình phù hợp --</option>';
+        response.data.forEach(progName => {
+          progSelect.innerHTML += `<option value="${progName}">${progName}</option>`;
+        });
+        progSelect.disabled = false;
+      })
+      .catch(err => {
+        progSelect.innerHTML = '<option value="">Lỗi tải dữ liệu chương trình</option>';
+      });
+    }
+
+    var globalBase64 = "";
+    var globalFileName = "";
+
+    // 3. XỬ LÝ TRA CỨU TỪ XA KHI BẤM NÚT ĐỂ LẤY VÀ IN FILE ẢNH
+    function handleSearch() {
+      const mssv = document.getElementById('mssvInput').value.trim();
+      const sheetNamHoc = document.getElementById('namHocSelect').value;
+      const program = document.getElementById('programSelect').value;
+      const btn = document.getElementById('btnSubmit');
+      const loader = document.getElementById('loadingStatus');
+      
+      if (!mssv) { alert("Vui lòng nhập Mã số sinh viên (MSSV)!"); return; }
+      if (!sheetNamHoc) { alert("Vui lòng lựa chọn Năm học!"); return; }
+      if (!program) { alert("Vui lòng lựa chọn chương trình cần tra cứu!"); return; }
+      
+      btn.disabled = true;
+      loader.style.display = 'block';
+      
+      fetch(GOOGLE_API_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "searchCert", mssv: mssv, namHoc: sheetNamHoc, program: program })
+      })
+      .then(res => res.json())
+      .then(response => {
+        btn.disabled = false;
+        loader.style.display = 'none';
+        
+        if (response.success) {
+          globalBase64 = response.base64Data;
+          globalFileName = response.fileName;
+          
+          document.getElementById('certPreview').src = response.base64Data;
+          
+          document.getElementById('btnDownload').onclick = function() {
+            const link = document.createElement('a');
+            link.href = globalBase64;
+            link.download = globalFileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          };
+          
+          document.getElementById('resultModal').style.display = 'flex';
+        } else {
+          alert(response.error);
+        }
+      })
+      .catch(err => {
+        btn.disabled = false;
+        loader.style.display = 'none';
+        alert("Lỗi kết nối máy chủ API: " + err.toString());
+      });
+    }
+
+    function closeModal() {
+      document.getElementById('resultModal').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
